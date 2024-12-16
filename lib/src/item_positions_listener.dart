@@ -21,10 +21,13 @@ abstract class ItemPositionsListener {
 /// Position information for an item in the list.
 class ItemPosition {
   /// Create an [ItemPosition].
-  const ItemPosition(
-      {required this.index,
-      required this.itemLeadingEdge,
-      required this.itemTrailingEdge});
+  const ItemPosition({
+    required this.index,
+    required this.itemLeadingEdge,
+    required this.itemTrailingEdge,
+    required this.itemSize,
+    required this.startOffset,
+  });
 
   /// Index of the item.
   final int index;
@@ -40,6 +43,9 @@ class ItemPosition {
   ///
   /// May be greater than one if the item is partially visible.
   final double itemTrailingEdge;
+
+  final double itemSize;
+  final double startOffset;
 
   @override
   bool operator ==(dynamic other) {
