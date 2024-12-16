@@ -331,13 +331,14 @@ class _PositionedListState extends State<PositionedList> {
           final ValueKey<int> key = element.widget.key as ValueKey<int>;
           // Skip this element if `box` has never been laid out.
           if (!box.hasSize) continue;
+
+          final Offset offset = box.localToGlobal(Offset.zero, ancestor: viewport);
+
           if (widget.scrollDirection == Axis.vertical) {
             final reveal = viewport!.getOffsetToReveal(box, 0).offset;
             if (!reveal.isFinite) continue;
             final itemOffset =
                 reveal - viewport.offset.pixels + anchor * viewport.size.height;
-
-            final startOffset = reveal;
 
             positions.add(ItemPosition(
                 index: key.value,
@@ -346,14 +347,11 @@ class _PositionedListState extends State<PositionedList> {
                 itemTrailingEdge: (itemOffset + box.size.height).round() /
                     scrollController.position.viewportDimension,
                     itemSize: box.size.height,
-                startOffset: startOffset,));
+                offset: offset));
           } else {
             final itemOffset =
                 box.localToGlobal(Offset.zero, ancestor: viewport).dx;
             if (!itemOffset.isFinite) continue;
-            final startOffset = widget.reverse
-              ? scrollController.position.maxScrollExtent - (itemOffset + box.size.width)
-              : itemOffset; 
 
             positions.add(ItemPosition(
                 index: key.value,
@@ -370,7 +368,7 @@ class _PositionedListState extends State<PositionedList> {
                         .round() /
                     scrollController.position.viewportDimension,
                 itemSize: box.size.width,
-                startOffset: startOffset,));
+                offset: offset));
           }
         }
         widget.itemPositionsNotifier?.itemPositions.value = positions;

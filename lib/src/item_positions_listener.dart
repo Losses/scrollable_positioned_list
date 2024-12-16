@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 
 import 'item_positions_notifier.dart';
@@ -26,7 +28,7 @@ class ItemPosition {
     required this.itemLeadingEdge,
     required this.itemTrailingEdge,
     required this.itemSize,
-    required this.startOffset,
+    required this.offset,
   });
 
   /// Index of the item.
@@ -45,7 +47,7 @@ class ItemPosition {
   final double itemTrailingEdge;
 
   final double itemSize;
-  final double startOffset;
+  final Offset offset;
 
   @override
   bool operator ==(dynamic other) {
