@@ -198,7 +198,7 @@ class ItemScrollController {
   /// If `false`, then [jumpTo] and [scrollTo] must not be called.
   bool get isAttached => _scrollableListState != null;
 
-  _ScrollablePositionedListState? _scrollableListState;
+  _ScrollablePositionedListState? scrollableListState;
 
   /// Immediately, without animation, reconfigure the list so that the item at
   /// [index]'s leading edge is at the given [alignment].
@@ -293,7 +293,7 @@ class ScrollOffsetController {
     );
   }
 
-  _ScrollablePositionedListState? _scrollableListState;
+  _ScrollablePositionedListState? scrollableListState;
 
   void _attach(_ScrollablePositionedListState scrollableListState) {
     assert(_scrollableListState == null);
