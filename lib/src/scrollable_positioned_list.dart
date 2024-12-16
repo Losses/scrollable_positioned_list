@@ -245,7 +245,8 @@ class ItemScrollController {
   /// See [TweenSequenceItem.weight] for more info.
   Future<void> scrollTo({
     required int index,
-    double alignment = 0,
+    double viewportAlignment = 0.0,
+    double edgeAlignment = 0.0,
     required Duration duration,
     Curve curve = Curves.linear,
     List<double> opacityAnimationWeights = const [40, 20, 40],
@@ -255,7 +256,8 @@ class ItemScrollController {
     assert(duration > Duration.zero);
     return _scrollableListState!._scrollTo(
       index: index,
-      alignment: alignment,
+      viewportAlignment: viewportAlignment,
+      edgeAlignment: edgeAlignment,
       duration: duration,
       curve: curve,
       opacityAnimationWeights: opacityAnimationWeights,
@@ -504,7 +506,8 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
 
   Future<void> _scrollTo({
     required int index,
-    required double alignment,
+    required double viewportAlignment,
+    double edgeAlignment = 0.0,
     required Duration duration,
     Curve curve = Curves.linear,
     required List<double> opacityAnimationWeights,
@@ -518,7 +521,8 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
       SchedulerBinding.instance.addPostFrameCallback((_) async {
         await _startScroll(
           index: index,
-          alignment: alignment,
+          viewportAlignment: viewportAlignment,
+          edgeAlignment: edgeAlignment,
           duration: duration,
           curve: curve,
           opacityAnimationWeights: opacityAnimationWeights,
@@ -529,7 +533,8 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
     } else {
       await _startScroll(
         index: index,
-        alignment: alignment,
+        viewportAlignment: viewportAlignment,
+        edgeAlignment: edgeAlignment,
         duration: duration,
         curve: curve,
         opacityAnimationWeights: opacityAnimationWeights,
@@ -539,7 +544,8 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
 
   Future<void> _startScroll({
     required int index,
-    required double alignment,
+    required double viewportAlignment,
+    double edgeAlignment = 0.0,
     required Duration duration,
     Curve curve = Curves.linear,
     required List<double> opacityAnimationWeights,
@@ -548,14 +554,17 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
     final itemPosition = primary.itemPositionsNotifier.itemPositions.value
         .firstWhereOrNull(
             (ItemPosition itemPosition) => itemPosition.index == index);
+            
     if (itemPosition != null) {
-      // Scroll directly.
-      final localScrollAmount = itemPosition.itemLeadingEdge *
+      final itemSize = itemPosition.itemTrailingEdge - itemPosition.itemLeadingEdge;
+      final effectiveItemEdge = itemPosition.itemLeadingEdge + (itemSize * edgeAlignment);
+      final localScrollAmount = effectiveItemEdge *
           primary.scrollController.position.viewportDimension;
+          
       await primary.scrollController.animateTo(
           primary.scrollController.offset +
               localScrollAmount -
-              alignment * primary.scrollController.position.viewportDimension,
+              viewportAlignment * primary.scrollController.position.viewportDimension,
           duration: duration,
           curve: curve);
     } else {
@@ -574,7 +583,7 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
           secondary.scrollController.jumpTo(-direction *
               (_screenScrollCount *
                       primary.scrollController.position.viewportDimension -
-                  alignment *
+                  viewportAlignment *
                       secondary.scrollController.position.viewportDimension));
 
           startCompleter.complete(primary.scrollController.animateTo(
@@ -589,7 +598,7 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
         // TODO: _startScroll can be re-entrant, which invalidates this assert.
         // assert(!_isTransitioning);
         secondary.target = index;
-        secondary.alignment = alignment;
+        secondary.alignment = viewportAlignment;
         _isTransitioning = true;
       });
       await Future.wait<void>([startCompleter.future, endCompleter.future]);
